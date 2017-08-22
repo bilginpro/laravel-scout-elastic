@@ -6,7 +6,7 @@ interface IsElasticSearchable
 {
     public static function search($query, $callback = null);
 
-    public static function elasticSearch($method, $query, array $params = null);
+    public static function elasticSearch(array $params);
 
     public function searchable();
 

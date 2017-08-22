@@ -131,33 +131,35 @@ class ElasticsearchEngine extends Engine
      */
     protected function performSearch(Builder $builder, array $options = [])
     {
-        $queryMethod = isset($builder->model->elasticQuery['method']) ?
-            $builder->model->elasticQuery['method'] : $this->queryConfig['default'];
-
-        $queryParams = isset($builder->model->elasticQuery['params']) ?
-            $builder->model->elasticQuery['params'] : $this->queryConfig[$queryMethod];
+//        $queryMethod = isset($builder->model->elasticQuery['method']) ?
+//            $builder->model->elasticQuery['method'] : $this->queryConfig['default'];
+//
+//        $queryParams = isset($builder->model->elasticQuery['params']) ?
+//            $builder->model->elasticQuery['params'] : $this->queryConfig[$queryMethod];
 
         $params = [
             'index' => $builder->model->searchableWithin(),
             'type' => $builder->model->searchableAs(),
-            'body' => [
-                'query' => [
-                    'bool' => [
-                        'must' => [
-                            [
-                                $queryMethod => array_merge([
-                                    'query' => "{$builder->query}"
-                                ], $queryParams)
-                            ]
-                        ]
-                    ]
-                ],
-                'sort' => [
-                    '_score'
-                ],
-                'track_scores' => true,
-            ]
+            'body' => $builder->model->elasticQuery['params']
         ];
+//            'body' => [
+//                'query' => [
+//                    'bool' => [
+//                        'must' => [
+//                            [
+//                                $queryMethod => array_merge([
+//                                    'query' => "{$builder->query}"
+//                                ], $queryParams)
+//                            ]
+//                        ]
+//                    ]
+//                ],
+//                'sort' => [
+//                    '_score'
+//                ],
+//                'track_scores' => true,
+//            ]
+//        ];
 
         if (isset($options['from'])) {
             $params['body']['from'] = $options['from'];
@@ -166,16 +168,16 @@ class ElasticsearchEngine extends Engine
         if (isset($options['size'])) {
             $params['body']['size'] = $options['size'];
         }
-
-        if (isset($options['numericFilters']) && count($options['numericFilters'])) {
-            $params['body']['query']['bool']['filter'] = $options['numericFilters'];
-        }
+//
+//        if (isset($options['numericFilters']) && count($options['numericFilters'])) {
+//            $params['body']['query']['bool']['filter'] = $options['numericFilters'];
+//        }
 
         // Sorting
-        if(isset($options['sorting']) && count($options['sorting'])) {
-            $params['body']['sort'] = array_merge($params['body']['sort'],
-                $options['sorting']);
-        }
+//        if(isset($options['sorting']) && count($options['sorting'])) {
+//            $params['body']['sort'] = array_merge($params['body']['sort'],
+//                $options['sorting']);
+//        }
 
         return $this->elastic->search($params);
     }

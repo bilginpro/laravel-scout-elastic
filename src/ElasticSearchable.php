@@ -25,21 +25,18 @@ trait ElasticSearchable
     /**
      * Search; Elasticsearch style
      *
-     * @param $method
-     * @param $query
-     * @param array|null $params
+     * @param array $params
      * @return ScoutBuilder
      */
-    public static function elasticSearch($method, $query, array $params = null)
+    public static function elasticSearch(array $params = null)
     {
         $model = new static;
 
         $model->elasticQuery = [
-            'method' => $method,
             'params' => $params
         ];
 
-        return new ScoutBuilder($model, $query);
+        return new ScoutBuilder($model, null);
     }
 
 }
