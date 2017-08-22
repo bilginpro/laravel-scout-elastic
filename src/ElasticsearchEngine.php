@@ -137,11 +137,10 @@ class ElasticsearchEngine extends Engine
 //        $queryParams = isset($builder->model->elasticQuery['params']) ?
 //            $builder->model->elasticQuery['params'] : $this->queryConfig[$queryMethod];
 
-        $params = [
+        $params = array_merge([
             'index' => $builder->model->searchableWithin(),
-            'type' => $builder->model->searchableAs(),
-            'body' => $builder->model->elasticQuery['params']
-        ];
+            'type' => $builder->model->searchableAs()
+            ], $builder->model->elasticQuery['params']);
 //            'body' => [
 //                'query' => [
 //                    'bool' => [
@@ -160,6 +159,8 @@ class ElasticsearchEngine extends Engine
 //                'track_scores' => true,
 //            ]
 //        ];
+
+//        dd($params);
 
         if (isset($options['from'])) {
             $params['body']['from'] = $options['from'];
