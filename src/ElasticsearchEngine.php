@@ -36,15 +36,14 @@ class ElasticsearchEngine extends Engine
     /**
      * Update the given model in the index.
      *
-     * @param  Collection  $models
+     * @param  Collection $models
      * @return void
      */
     public function update($models)
     {
         $params['body'] = [];
 
-        $models->each(function($model) use (&$params)
-        {
+        $models->each(function ($model) use (&$params) {
             $params['body'][] = [
                 'update' => [
                     '_id' => $model->getKey(),
@@ -64,15 +63,14 @@ class ElasticsearchEngine extends Engine
     /**
      * Remove the given model from the index.
      *
-     * @param  Collection  $models
+     * @param  Collection $models
      * @return void
      */
     public function delete($models)
     {
         $params['body'] = [];
 
-        $models->each(function($model) use (&$params)
-        {
+        $models->each(function ($model) use (&$params) {
             $params['body'][] = [
                 'delete' => [
                     '_id' => $model->getKey(),
@@ -88,7 +86,7 @@ class ElasticsearchEngine extends Engine
     /**
      * Perform the given search on the engine.
      *
-     * @param  Builder  $builder
+     * @param  Builder $builder
      * @return mixed
      */
     public function search(Builder $builder)
@@ -103,9 +101,9 @@ class ElasticsearchEngine extends Engine
     /**
      * Perform the given search on the engine.
      *
-     * @param  Builder  $builder
-     * @param  int  $perPage
-     * @param  int  $page
+     * @param  Builder $builder
+     * @param  int $perPage
+     * @param  int $page
      * @return mixed
      */
     public function paginate(Builder $builder, $perPage, $page)
@@ -117,7 +115,7 @@ class ElasticsearchEngine extends Engine
             'size' => $perPage,
         ]);
 
-        $result['nbPages'] = $result['hits']['total']/$perPage;
+        $result['nbPages'] = $result['hits']['total'] / $perPage;
 
         return $result;
     }
@@ -125,8 +123,8 @@ class ElasticsearchEngine extends Engine
     /**
      * Perform the given search on the engine.
      *
-     * @param  Builder  $builder
-     * @param  array  $options
+     * @param  Builder $builder
+     * @param  array $options
      * @return mixed
      */
     protected function performSearch(Builder $builder, array $options = [])
@@ -172,9 +170,18 @@ class ElasticsearchEngine extends Engine
         }
 
         // Sorting
-        if(isset($options['sorting']) && count($options['sorting'])) {
-            $params['body']['sort'] = array_merge($params['body']['sort'],
-                $options['sorting']);
+        if (isset($options['sorting']) && count($options['sorting'])) {
+            if (config('elasticsearch.prior_sorting_param', 'predefined') == 'predefined') {
+                $params['body']['sort'] = array_merge(
+                    $params['body']['sort'],
+                    $options['sorting']
+                );
+            } else {
+                $params['body']['sort'] = array_merge(
+                    $options['sorting'],
+                    $params['body']['sort']
+                );
+            }
         }
 
         return $this->elastic->search($params);
@@ -183,7 +190,7 @@ class ElasticsearchEngine extends Engine
     /**
      * Get the filter array for the query.
      *
-     * @param  Builder  $builder
+     * @param  Builder $builder
      * @return array
      */
     protected function filters(Builder $builder)
@@ -207,7 +214,7 @@ class ElasticsearchEngine extends Engine
     /**
      * Pluck and return the primary keys of the given results.
      *
-     * @param  mixed  $results
+     * @param  mixed $results
      * @return \Illuminate\Support\Collection
      */
     public function mapIds($results)
@@ -218,8 +225,8 @@ class ElasticsearchEngine extends Engine
     /**
      * Map the given results to instances of the given model.
      *
-     * @param  mixed  $results
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  mixed $results
+     * @param  \Illuminate\Database\Eloquent\Model $model
      * @return Collection
      */
     public function map($results, $model)
@@ -247,7 +254,7 @@ class ElasticsearchEngine extends Engine
     /**
      * Get the total count from a raw result returned by the engine.
      *
-     * @param  mixed  $results
+     * @param  mixed $results
      * @return int
      */
     public function getTotalCount($results)
