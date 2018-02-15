@@ -231,7 +231,7 @@ class ElasticsearchEngine extends Engine
      */
     public function map($results, $model)
     {
-        if (count($results['hits']['total']) === 0) {
+        if (is_array($results['hits']['total']) && count($results['hits']['total']) === 0) {
             return Collection::make();
         }
 
