@@ -115,7 +115,9 @@ class ElasticsearchEngine extends Engine
             'size' => $perPage,
         ]);
 
-        $result['nbPages'] = $result['hits']['total'] / $perPage;
+        $total = is_integer($result['hits']['total']) ? $result['hits']['total'] : $result['hits']['total']['value'];
+
+        $result['nbPages'] = $total / $perPage;
 
         return $result;
     }
@@ -231,7 +233,9 @@ class ElasticsearchEngine extends Engine
      */
     public function map($results, $model)
     {
-        if (is_array($results['hits']['total']) && count($results['hits']['total']) === 0) {
+        $total = is_integer($results['hits']['total']) ? $results['hits']['total'] : $results['hits']['total']['value'];
+
+        if ($total === 0) {
             return Collection::make();
         }
 
@@ -259,6 +263,7 @@ class ElasticsearchEngine extends Engine
      */
     public function getTotalCount($results)
     {
-        return $results['hits']['total'];
+        $total = is_integer($results['hits']['total']) ? $results['hits']['total'] : $results['hits']['total']['value'];
+        return $total;
     }
 }
