@@ -2,6 +2,7 @@
 
 namespace ScoutEngines\Elasticsearch;
 
+use Laravel\Scout\Builder;
 use Laravel\Scout\EngineManager;
 use Illuminate\Support\ServiceProvider;
 use Elasticsearch\ClientBuilder as ElasticBuilder;
@@ -15,6 +16,11 @@ class ElasticsearchProvider extends ServiceProvider
      */
     public function boot()
     {
+        Builder::macro('whereIn', function (string $field, array $values) {
+            $this->whereIns[$field] = $values;
+            return $this;
+        });
+
         resolve(EngineManager::class)->extend('elasticsearch', function($app) {
             return new ElasticsearchEngine(ElasticBuilder::create()
                 ->setHosts(config('elasticsearch.hosts'))

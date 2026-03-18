@@ -197,9 +197,15 @@ class ElasticsearchEngine extends Engine
      */
     protected function filters(Builder $builder)
     {
-        return collect($builder->wheres)->map(function ($value, $key) {
+        $wheres = collect($builder->wheres)->map(function ($value, $key) {
             return ['term' => [$key => $value]];
-        })->values()->all();
+        });
+
+        $whereIns = collect($builder->whereIns ?? [])->map(function ($values, $key) {
+            return ['terms' => [$key => $values]];
+        });
+
+        return $wheres->merge($whereIns)->values()->all();
     }
 
     /**
